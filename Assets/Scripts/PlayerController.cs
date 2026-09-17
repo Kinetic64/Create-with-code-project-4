@@ -1,13 +1,17 @@
 using UnityEngine;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     private InputSystem_Actions controls;
-    public float rotationSpeed = -150f;
+    private Rigidbody playerRb;
+    private GameObject focalPoint;
+    public float playerSpeed = 150f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         controls = new InputSystem_Actions();
+        playerRb = GetComponent<Rigidbody>();
+        focalPoint = GameObject.Find("Focal Point");
     }
 
     private void OnEnable()
@@ -19,7 +23,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
     private void Update()
     {
         Vector2 moveInput = controls.Player.Move.ReadValue<Vector2>();
-        float horizontalInput = moveInput.x;
-        transform.Rotate(Vector3.up, horizontalInput * rotationSpeed * Time.deltaTime);
+        float forwardInput = moveInput.y;
+        playerRb.AddForce(focalPoint.transform.forward * forwardInput * playerSpeed * Time.deltaTime);
     }    
 }
