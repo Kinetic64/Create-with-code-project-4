@@ -14,7 +14,6 @@ public class NewMonoBehaviourScript : MonoBehaviour
     private void OnEnable()
     {
         controls.Player.Enable();
-        Debug.Log(controls.Player.Move);
     }
 
     private void Update()

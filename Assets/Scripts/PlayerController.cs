@@ -1,9 +1,11 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
     public bool hasPowerup = false;
     public float playerSpeed = 150f;
+    public GameObject powerupIndicator;
     private InputSystem_Actions controls;
     private Rigidbody playerRb;
     private GameObject focalPoint;
@@ -21,7 +23,6 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         controls.Player.Enable();
-        Debug.Log(controls.Player.Move);
     }
 
     private void Update()
@@ -29,6 +30,8 @@ public class PlayerController : MonoBehaviour
         Vector2 moveInput = controls.Player.Move.ReadValue<Vector2>();
         float forwardInput = moveInput.y;
         playerRb.AddForce(focalPoint.transform.forward * forwardInput * playerSpeed * Time.deltaTime);
+        powerupIndicator.transform.position = transform.position - new Vector3(0, 0.6926f, 0);
+        powerupIndicator.transform.Rotate (Vector3.up * Time.deltaTime * 100);
     }    
 
     private void OnTriggerEnter(Collider other)
@@ -36,8 +39,17 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Powerup"))
         {
             hasPowerup = true;
+            powerupIndicator.gameObject.SetActive(true);
             Destroy (other.gameObject);
+            StartCoroutine(PowerupCountdownRoutine());
         }
+    }
+
+    IEnumerator PowerupCountdownRoutine()
+    {
+        yield return new WaitForSeconds(7);
+        hasPowerup = false;
+        powerupIndicator.gameObject.SetActive(false);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -47,7 +59,6 @@ public class PlayerController : MonoBehaviour
             Rigidbody enemyRigidbogy = collision.gameObject.GetComponent<Rigidbody>();
             Vector3 awayFromPlayer = (collision.gameObject.transform.position - transform.position);
 
-            Debug.Log("Collided with" + collision.gameObject.name + "with powerup set to" + hasPowerup);
             enemyRigidbogy.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
         }
     }
